@@ -25,7 +25,6 @@ d_output_dims = 2
 
 # params for training network
 num_gpu = 1
-"""
 num_epochs_pre = 100
 log_step_pre = 100
 save_step_pre = 10
@@ -35,8 +34,8 @@ num_epochs_adapt = 2000
 log_step_adapt = 100
 save_step_adapt = 100
 eval_step_adapt = 5
-"""
 
+"""
 num_epochs_pre = 20
 log_step_pre = 100
 save_step_pre = 10
@@ -46,7 +45,7 @@ num_epochs_adapt = 40
 log_step_adapt = 100
 save_step_adapt = 20
 eval_step_adapt = 5
-
+"""
 manual_seed = None
 
 # params for optimizing models
