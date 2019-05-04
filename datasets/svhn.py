@@ -4,25 +4,26 @@ from .datagen import DataGenerator
 
 import params
 
-def get_mnistm(train):
-    """Get MNIST_M dataset loader."""
+def get_svhn(train):
+    """Get USPS dataset loader."""
     # image pre-processing
+    
     if train:
         transform = transforms.Compose([
             transforms.RandomCrop((28)),
             transforms.ToTensor(),
-            transforms.Normalize(mean= params.dataset_mean, std= params.dataset_std)
+            transforms.Normalize(mean=params.dataset_mean, std=params.dataset_std)
         ])
     else:
         transform = transforms.Compose([
             transforms.CenterCrop((28)),
             transforms.ToTensor(),
-            transforms.Normalize(mean= params.dataset_mean, std= params.dataset_std)
+            transforms.Normalize(mean= params.dataset_mean, std = params.dataset_std)
         ])
-
+        
     # dataset and data loader
     dataset = DataGenerator(
-        data_root = params.mnistm_data,
+        data_root = params.svhn_data,
         train = train,
         transform = transform
     )
@@ -30,4 +31,4 @@ def get_mnistm(train):
     return dataset
 
 if __name__ == "__main__":
-    get_mnistm(True)
+    get_svhn(True)

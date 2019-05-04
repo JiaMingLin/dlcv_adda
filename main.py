@@ -1,9 +1,9 @@
 """Main script for ADDA."""
-
 import params
 from core import train_src, train_tgt, evaluation
 from models import Discriminator, LeNetClassifier, LeNetEncoder
 from utils import get_data_loader, init_model, init_random_seed
+
 
 if __name__ == '__main__':
     # init random seed

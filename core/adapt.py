@@ -7,17 +7,18 @@ import torch.optim as optim
 from torch import nn
 
 import params
-from utils import make_variable
+from utils import make_variable, save_model
 from .test import evaluation
 
 
-def train_tgt(src_encoder, tgt_encoder, critic, src_classifier,
+def train_tgt(exp, src_encoder, tgt_encoder, critic, src_classifier,
               src_data_loader, tgt_data_loader, tgt_data_loader_eval):
     """Train encoder for target domain."""
+    
     ####################
     # 1. setup network #
     ####################
-
+    tgt_acc = 0
     # set train state for Dropout and BN layers
     tgt_encoder.train()
     critic.train()
@@ -36,7 +37,7 @@ def train_tgt(src_encoder, tgt_encoder, critic, src_classifier,
     # 2. train network #
     ####################
 
-    for epoch in range(params.num_epochs):
+    for epoch in range(params.num_epochs_adapt):
         # zip source and target data pair
         data_zip = enumerate(zip(src_data_loader, tgt_data_loader))
         for step, ((images_src, _), (images_tgt, _)) in data_zip:
@@ -101,11 +102,11 @@ def train_tgt(src_encoder, tgt_encoder, critic, src_classifier,
             #######################
             # 2.3 print step info #
             #######################
-            if ((step + 1) % params.log_step == 0):
+            if ((step + 1) % params.log_step_adapt == 0):
                 print("Epoch [{}/{}] Step [{}/{}]:"
                       "d_loss={:.5f} g_loss={:.5f} acc={:.5f}"
                       .format(epoch + 1,
-                              params.num_epochs,
+                              params.num_epochs_adapt,
                               step + 1,
                               len_data_loader,
                               loss_critic.item(),
@@ -115,24 +116,20 @@ def train_tgt(src_encoder, tgt_encoder, critic, src_classifier,
         #############################
         # 2.4 save model parameters #
         #############################
-        if ((epoch + 1) % params.save_step == 0):
-            torch.save(critic.state_dict(), os.path.join(
-                params.model_root,
-                "ADDA-critic-{}.pt".format(epoch + 1)))
-            torch.save(tgt_encoder.state_dict(), os.path.join(
-                params.model_root,
-                "ADDA-target-encoder-{}.pt".format(epoch + 1)))
+        if ((epoch + 1) % params.save_step_adapt == 0):
+            save_model(exp, critic, "ADDA-critic-{}.pt".format(epoch + 1))
+            save_model(exp, tgt_encoder, "ADDA-target-encoder-{}.pt".format(epoch + 1))
             
-        #############################
-        # eval model on test set    #
-        #############################
+        ##############################
+        # 2.5 eval model on test set #
+        ##############################
         if ((epoch + 1) % params.eval_step_adapt == 0):
-            evaluation(tgt_encoder, src_classifier, tgt_data_loader_eval)
+            acc = evaluation(tgt_encoder, src_classifier, tgt_data_loader_eval)
+            if acc > tgt_acc:
+                print("============== Save Best Model =============")
+                save_model(exp, critic, "ADDA-critic-best.pt")
+                save_model(exp, tgt_encoder, "ADDA-target-encoder-best.pt")
+                tgt_acc = acc
 
-    torch.save(critic.state_dict(), os.path.join(
-        params.model_root,
-        "ADDA-critic-final.pt"))
-    torch.save(tgt_encoder.state_dict(), os.path.join(
-        params.model_root,
-        "ADDA-target-encoder-final.pt"))
+    
     return tgt_encoder

@@ -11,35 +11,42 @@ dataset_mean = (dataset_mean_value, dataset_mean_value, dataset_mean_value)
 dataset_std = (dataset_std_value, dataset_std_value, dataset_std_value)
 batch_size = 50
 
-# params for source dataset
-src_dataset = "MNIST"
-src_encoder_restore = "snapshots/ADDA-source-encoder-final.pt"
-src_classifier_restore = "snapshots/ADDA-source-classifier-final.pt"
-src_model_trained = True
-
-# params for target dataset
-tgt_dataset = "USPS"
-tgt_encoder_restore = "snapshots/ADDA-target-encoder-final.pt"
-tgt_model_trained = False
-
-# params for setting up models
+# models
 model_root = "snapshots"
+src_encoder_restore = 'snapshots/{:s}/ADDA-source-encoder-best.pt'
+src_classifier_restore = "snapshots/{:s}/ADDA-source-classifier-best.pt"
+tgt_encoder_restore = "snapshots/{:s}/ADDA-target-encoder-best.pt"
+d_model_restore = "snapshots/{:s}/ADDA-critic-best.pt"
+src_model_trained = True
+tgt_model_trained = True
 d_input_dims = 500
 d_hidden_dims = 500
 d_output_dims = 2
-d_model_restore = "snapshots/ADDA-critic-final.pt"
 
 # params for training network
 num_gpu = 1
+"""
 num_epochs_pre = 100
 log_step_pre = 100
-eval_step_pre = 10
 save_step_pre = 10
+eval_step_pre = 5
 
-num_epochs = 2000
-log_step = 100
-save_step = 100
+num_epochs_adapt = 2000
+log_step_adapt = 100
+save_step_adapt = 100
 eval_step_adapt = 5
+"""
+
+num_epochs_pre = 20
+log_step_pre = 100
+save_step_pre = 10
+eval_step_pre = 5
+
+num_epochs_adapt = 40
+log_step_adapt = 100
+save_step_adapt = 20
+eval_step_adapt = 5
+
 manual_seed = None
 
 # params for optimizing models

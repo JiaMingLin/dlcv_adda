@@ -8,7 +8,7 @@ import torch.backends.cudnn as cudnn
 from torch.autograd import Variable
 
 import params
-from datasets import get_mnist, get_usps
+from datasets import get_usps, get_mnist,get_mnistm, get_svhn
 
 
 def make_variable(tensor):
@@ -59,9 +59,13 @@ def get_data_loader(name, train=True):
     """Get data loader by name."""
     if name == "MNIST":
         dataset = get_mnist(train)
+    elif name == "MNISTM":
+        dataset = get_mnistm(train)
     elif name == "USPS":
         dataset = get_usps(train)
-    
+    elif name == "SVHN":
+        dataset = get_svhn(train)
+        
     if train:
         data_loader = torch.utils.data.DataLoader(
             dataset=dataset,
@@ -76,11 +80,12 @@ def get_data_loader(name, train=True):
     return data_loader
 
 
-def init_model(net, restore):
+def init_model(net, restore, exp = None):
     """Init models with cuda and weights."""
     # init weights of model
     net.apply(init_weights)
-
+    
+    restore = restore.format(exp)
     # restore model weights
     if restore is not None and os.path.exists(restore):
         net.load_state_dict(torch.load(restore))
@@ -95,11 +100,12 @@ def init_model(net, restore):
     return net
 
 
-def save_model(net, filename):
+def save_model(exp, net, filename):
     """Save trained model."""
-    if not os.path.exists(params.model_root):
-        os.makedirs(params.model_root)
+    save_root = os.path.join(params.model_root, exp)
+    if not os.path.exists(save_root):
+        os.makedirs(save_root)
     torch.save(net.state_dict(),
-               os.path.join(params.model_root, filename))
-    print("save pretrained model to: {}".format(os.path.join(params.model_root,
+               os.path.join(save_root, filename))
+    print("save pretrained model to: {}".format(os.path.join(save_root,
                                                              filename)))

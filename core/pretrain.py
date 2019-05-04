@@ -8,12 +8,12 @@ from utils import make_variable, save_model
 from .test import evaluation
 
 
-def train_src(encoder, classifier, data_loader, data_loader_eval):
+def train_src(exp, encoder, classifier, data_loader, data_loader_eval):
     """Train classifier for source domain."""
     ####################
     # 1. setup network #
     ####################
-
+    src_acc = 0
     # set train state for Dropout and BN layers
     encoder.train()
     classifier.train()
@@ -55,51 +55,19 @@ def train_src(encoder, classifier, data_loader, data_loader_eval):
                               len(data_loader),
                               loss.item()))
 
-        # eval model on test set
-        if ((epoch + 1) % params.eval_step_pre == 0):
-            evaluation(encoder, classifier, data_loader_eval)
-
         # save model parameters
         if ((epoch + 1) % params.save_step_pre == 0):
-            save_model(encoder, "ADDA-source-encoder-{}.pt".format(epoch + 1))
-            save_model(
-                classifier, "ADDA-source-classifier-{}.pt".format(epoch + 1))
+            save_model(exp, encoder, "ADDA-source-encoder-{}.pt".format(epoch + 1))
+            save_model(exp, classifier, "ADDA-source-classifier-{}.pt".format(epoch + 1))
+            
+        # eval model on test set
+        if ((epoch + 1) % params.eval_step_pre == 0):
+            acc = evaluation(encoder, classifier, data_loader_eval)
+            if acc > src_acc:
+                print("============== Save Best Model =============")
+                save_model(exp, encoder, "ADDA-source-encoder-best.pt")
+                save_model(exp, classifier, "ADDA-source-classifier-best.pt")
+                src_acc = acc
 
-    # # save final model
-    save_model(encoder, "ADDA-source-encoder-final.pt")
-    save_model(classifier, "ADDA-source-classifier-final.pt")
 
     return encoder, classifier
-
-"""
-def eval_src(encoder, classifier, data_loader):
-    #Evaluate classifier for source domain.
-    # set eval state for Dropout and BN layers
-    encoder.eval()
-    classifier.eval()
-
-    # init loss and accuracy
-    loss = 0
-    acc = 0
-
-    # set loss function
-    criterion = nn.CrossEntropyLoss()
-
-    # evaluate network
-    with torch.no_grad():
-        for i, (images, labels) in enumerate(data_loader):
-            images = make_variable(images)
-            labels = make_variable(labels)
-
-            preds = classifier(encoder(images))
-            loss += criterion(preds, labels).item()
-
-            pred_cls = preds.data.max(1)[1]
-            acc += pred_cls.eq(labels.data).cpu().sum()
-
-    acc = acc.float()
-    loss /= len(data_loader)
-    acc /= len(data_loader.dataset)
-
-    print("Avg Loss = {}, Avg Accuracy = {:2%}".format(loss, acc))
-"""
