@@ -9,7 +9,7 @@ dataset_mean_value = 0.5
 dataset_std_value = 0.5
 dataset_mean = (dataset_mean_value, dataset_mean_value, dataset_mean_value)
 dataset_std = (dataset_std_value, dataset_std_value, dataset_std_value)
-batch_size = 50
+batch_size = 128
 
 # models
 model_root = "snapshots"
@@ -25,15 +25,15 @@ d_output_dims = 2
 
 # params for training network
 num_gpu = 1
-num_epochs_pre = 100
+num_epochs_pre = 200
 log_step_pre = 100
-save_step_pre = 10
-eval_step_pre = 5
+save_step_pre = 50
+eval_step_pre = 10
 
 num_epochs_adapt = 2000
 log_step_adapt = 100
-save_step_adapt = 100
-eval_step_adapt = 5
+save_step_adapt = 500
+eval_step_adapt = 10
 
 """
 num_epochs_pre = 20
@@ -49,7 +49,7 @@ eval_step_adapt = 5
 manual_seed = None
 
 # params for optimizing models
-d_learning_rate = 1e-4
-c_learning_rate = 1e-4
+d_learning_rate = 1e-3
+c_learning_rate = 2 * 1e-4
 beta1 = 0.5
 beta2 = 0.9
