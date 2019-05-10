@@ -9,6 +9,7 @@ from torch import nn
 import params
 from utils import make_variable, save_model
 from .test import evaluation
+from tensorboardX import SummaryWriter
 
 
 def train_tgt(exp, src_encoder, tgt_encoder, critic, src_classifier,
@@ -36,7 +37,9 @@ def train_tgt(exp, src_encoder, tgt_encoder, critic, src_classifier,
     ####################
     # 2. train network #
     ####################
-
+    writer = SummaryWriter(
+        log_dir = os.path.join('runs', exp)
+    )
     for epoch in range(params.num_epochs_adapt):
         # zip source and target data pair
         data_zip = enumerate(zip(src_data_loader, tgt_data_loader))
@@ -125,11 +128,12 @@ def train_tgt(exp, src_encoder, tgt_encoder, critic, src_classifier,
         ##############################
         if ((epoch + 1) % params.eval_step_adapt == 0):
             acc = evaluation(tgt_encoder, src_classifier, tgt_data_loader_eval)
+            writer.add_scalar('tgt_acc', acc*100, (epoch + 1))
             if acc > tgt_acc:
                 print("============== Save Best Model =============")
                 save_model(exp, critic, "ADDA-critic-best.pt")
                 save_model(exp, tgt_encoder, "ADDA-target-encoder-best.pt")
                 tgt_acc = acc
-
+    writer.close()
     
     return tgt_encoder

@@ -1,4 +1,5 @@
 """Pre-train encoder and classifier for source dataset."""
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -6,6 +7,7 @@ import torch.optim as optim
 import params
 from utils import make_variable, save_model
 from .test import evaluation
+from tensorboardX import SummaryWriter
 
 
 def train_src(exp, encoder, classifier, data_loader, data_loader_eval):
@@ -28,7 +30,9 @@ def train_src(exp, encoder, classifier, data_loader, data_loader_eval):
     ####################
     # 2. train network #
     ####################
-
+    writer = SummaryWriter(
+        log_dir = os.path.join('runs', exp)
+    )
     for epoch in range(params.num_epochs_pre):
         for step, (images, labels) in enumerate(data_loader):
             # make images and labels variable
@@ -63,11 +67,13 @@ def train_src(exp, encoder, classifier, data_loader, data_loader_eval):
         # eval model on test set
         if ((epoch + 1) % params.eval_step_pre == 0):
             acc = evaluation(encoder, classifier, data_loader_eval)
+            writer.add_scalar('src_acc', acc*100, (epoch + 1))
             if acc > src_acc:
                 print("============== Save Best Model =============")
                 save_model(exp, encoder, "ADDA-source-encoder-best.pt")
                 save_model(exp, classifier, "ADDA-source-classifier-best.pt")
                 src_acc = acc
 
-
+    writer.close()
+        
     return encoder, classifier

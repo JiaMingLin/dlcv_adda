@@ -4,21 +4,23 @@ from core import train_src, train_tgt, evaluation
 from models import Discriminator, LeNetClassifier, LeNetEncoder
 from utils import get_data_loader, init_model, init_random_seed
 
-exp_list = ['MNIST_USPS', 'USPS_MNISTM', 'MNISTM_SVHN', 'SVHN_USPS']
-cases = ['source', 'adapt', 'target']
+exp_list = ['SVHN_USPS', 'USPS_MNISTM', 'MNISTM_SVHN']
+#cases = ['source', 'adapt', 'target']
 
-@click.command()
-@click.option('--exp', type=click.Choice(exp_list), required=True)
-@click.option('--case', type=click.Choice(cases), default='adapt')
-@click.option('--affine', is_flag=True)
-@click.option('--num_epochs', type=int, default=200)
-def experiments(exp, case, affine, num_epochs):
+#@click.command()
+#@click.option('--exp', type=click.Choice(exp_list), required=True)
+#@click.option('--case', type=click.Choice(cases), default='adapt')
+#@click.option('--affine', is_flag=True)
+#@click.option('--num_epochs', type=int, default=200)
+def experiments(exp):
     
-    print(exp, case, affine, num_epochs)
+    #print(exp, case, affine, num_epochs)
     
     # init random seed
+    #params.d_learning_rate = lr_d
+    #params.c_learning_rate = lr_c
     init_random_seed(params.manual_seed)
-
+    
     # load dataset
     src_dataset, tgt_dataset = exp.split('_')
     src_data_loader = get_data_loader(src_dataset)
@@ -91,4 +93,7 @@ def experiments(exp, case, affine, num_epochs):
     evaluation(tgt_encoder, src_classifier, tgt_data_loader_eval)
 
 if __name__ == '__main__':
-    experiments()
+    lr_d_list = [0.0001, 0.0005 ,0.001, 0.005, 0.01]
+    lr_c_list = [0.0001,0.0002, 0.0004,0.0008]
+    for exp in exp_list:
+        experiments(exp)

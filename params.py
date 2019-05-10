@@ -28,12 +28,12 @@ num_gpu = 1
 num_epochs_pre = 200
 log_step_pre = 100
 save_step_pre = 50
-eval_step_pre = 10
+eval_step_pre = 5
 
-num_epochs_adapt = 2000
+num_epochs_adapt = 1500
 log_step_adapt = 100
 save_step_adapt = 500
-eval_step_adapt = 10
+eval_step_adapt = 5
 
 """
 num_epochs_pre = 20
